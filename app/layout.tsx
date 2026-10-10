@@ -3,7 +3,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Pinfaces — Your photos. Your control.",
   description:
-    "Private, exact-image search in your own collection. Real face detection. No identity tracking, no public-web indexing.",
+    "Find copies of your photographs on the web with Google Lens. Real source links, transparent privacy, no fabricated matches.",
 };
 export default function RootLayout({
   children,

@@ -7,3 +7,5 @@ Documentation: https://scikit-image.org/docs/stable/api/skimage.data.html#skimag
 NASA imagery policy/public-domain attribution: https://www.nasa.gov/nasa-brand-center/images-and-media/
 
 This fixture is not seeded into users' collections. No representation that the pictured person has consented to identity search is made.
+
+`earth.jpg` is a resized NASA Apollo 17 Blue Marble photograph downloaded from https://images-assets.nasa.gov/image/as17-148-22727/as17-148-22727~orig.jpg. It is used only by the opt-in live reverse-image-search test. No person identification is tested. NASA imagery usage policy applies: https://www.nasa.gov/nasa-brand-center/images-and-media/.

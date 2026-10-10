@@ -7,4 +7,4 @@ Pinfaces uses OpenCV's `haarcascade_frontalface_default.xml` for face detection,
 - Python `opencv-python` packaging license: https://github.com/opencv/opencv-python/blob/master/LICENSE.txt
 - Face test photograph attribution: [fixture documentation](../tests/fixtures/README.md)
 
-No InsightFace/ArcFace identity model, identity dataset, biometric vectors or third-party recognition API is included. Original Pinfaces wordmark and upload illustration are rendered in code. Lucide icons are ISC licensed; Next.js, React, Tailwind, idb and FastAPI use permissive licenses. Preserve upstream dependency notices when distributing.
+No InsightFace/ArcFace identity model, identity dataset, biometric vectors or third-party recognition API is included. Original Pinfaces wordmark and upload illustration are rendered in code. Lucide icons are ISC licensed; Next.js, React, Tailwind, Sharp and FastAPI use permissive licenses. Preserve upstream dependency notices when distributing.
