@@ -1017,3 +1017,50 @@ footer > span:last-child {
     transition: none !important;
   }
 }
+.web-consent {
+  margin: 24px 0 12px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.result-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.result-content h3 {
+  overflow-wrap: anywhere;
+}
+.result-content a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.privacy-section {
+  max-width: 946px;
+  margin: 64px auto;
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+.privacy-section p {
+  line-height: 1.8;
+  margin: 14px 0;
+}
+.header nav a {
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .header nav {
+    display: none;
+  }
+  .privacy-section {
+    margin: 40px 20px;
+    padding: 24px;
+  }
+}
+h1 em {
+  color: var(--green);
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
