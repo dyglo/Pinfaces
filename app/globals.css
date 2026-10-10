@@ -1064,3 +1064,22 @@ h1 em {
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
 }
+.action-area .primary-button {
+  justify-content: center;
+  gap: 10px;
+}
+.web-consent input {
+  margin-right: 9px;
+  vertical-align: middle;
+}
+.privacy-section > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.result-content .result-meta {
+  display: block;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+}

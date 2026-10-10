@@ -99,6 +99,17 @@ test("live provider returns real source pages for a public NASA Earth image", as
     );
   expect(links.length).toBeGreaterThan(0);
   expect(links.every((link) => /^https?:\/\//.test(link))).toBe(true);
+  const sourceResponse = await page.request.get(links[0]);
+  expect(sourceResponse.status()).toBeLessThan(400);
+  await expect(page.locator(".result-image img").first()).toBeVisible();
+  await expect
+    .poll(() =>
+      page
+        .locator(".result-image img")
+        .first()
+        .evaluate((image) => (image as HTMLImageElement).naturalWidth),
+    )
+    .toBeGreaterThan(0);
   console.log(
     JSON.stringify({
       sources: links.length,
