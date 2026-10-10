@@ -1083,3 +1083,171 @@ h1 em {
   padding: 0;
   border: 0;
 }
+.recognition-hero {
+  padding-bottom: 8px;
+}
+.recognition-hero h1 {
+  font-size: 48px;
+}
+.recognition-boundary {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 20px auto 0;
+  max-width: 540px;
+  line-height: 1.7;
+}
+.recognition-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px 50px;
+}
+.recognition-main .search-card {
+  margin: 24px auto;
+  max-width: 680px;
+  padding: 28px;
+}
+.recognition-main .search-card > p {
+  color: var(--muted);
+  line-height: 1.8;
+  margin: 16px 0;
+}
+.recognition-main .primary-button {
+  justify-content: center;
+  gap: 10px;
+  margin: 18px 0 0;
+}
+.recognition-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+.recognition-form > label:not(.consent) {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+.recognition-form input:not([type="checkbox"]) {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--bg);
+  color: var(--ink);
+  padding: 13px;
+}
+.recognition-main .consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.recognition-main .consent input {
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.recognition-main .consent span {
+  line-height: 1.8;
+}
+.recognition-main summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+}
+.recognition-main .subtle-button {
+  margin: 12px 10px 0 0;
+}
+.setup-state {
+  text-align: center;
+}
+.setup-state > svg {
+  margin: auto;
+  color: var(--green);
+}
+.account-bar {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow-wrap: anywhere;
+}
+.recognition-dropzone {
+  min-height: 200px;
+  gap: 14px;
+}
+.recognition-preview {
+  text-align: center;
+  margin: 24px 0;
+}
+.recognition-frame {
+  display: inline-block;
+  position: relative;
+  max-width: 100%;
+}
+.recognition-frame img {
+  display: block;
+  max-width: 100%;
+  max-height: 340px;
+  border-radius: 12px;
+}
+.recognition-results {
+  margin: 40px auto;
+}
+.permission-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.permission-list small {
+  display: block;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.domain-permission {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.break-text,
+.message {
+  overflow-wrap: anywhere;
+}
+.deletion-panel > .subtle-button {
+  display: flex;
+}
+.recognition-privacy {
+  max-width: 680px;
+  margin: 45px auto 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.9;
+}
+.recognition-privacy h3 {
+  color: var(--ink);
+  margin: 10px 0;
+  font-size: 17px;
+}
+@media (max-width: 600px) {
+  .recognition-hero h1 {
+    font-size: 35px;
+  }
+  .recognition-main {
+    padding: 0 16px 35px;
+  }
+  .recognition-main .search-card {
+    padding: 20px;
+  }
+  .account-bar {
+    font-size: 12px;
+  }
+  .account-bar .subtle-button {
+    white-space: nowrap;
+  }
+  .enrollment-shell .header {
+    gap: 16px;
+  }
+  .enrollment-shell .private-label {
+    margin-left: auto;
+  }
+}

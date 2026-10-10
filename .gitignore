@@ -9,3 +9,6 @@ __pycache__/
 playwright-report/
 test-results/
 *.tsbuildinfo
+backend/models/*.onnx
+backend/data/
+*.sqlite*

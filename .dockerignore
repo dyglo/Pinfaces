@@ -1,0 +1,10 @@
+.git
+.next
+node_modules
+.venv
+.env*
+backend/models/*.onnx
+backend/data
+**/__pycache__
+test-results
+playwright-report

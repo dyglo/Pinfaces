@@ -22,6 +22,7 @@ jobs:
       - run: npm ci
       - run: python -m venv .venv && .venv/bin/pip install -r backend/requirements-dev.txt
       - run: npm run lint && npm run typecheck && npm test
+      - run: .venv/bin/python -m backend.download_models
       - run: .venv/bin/python -m pytest backend/tests -q
       - run: npm run build
       - run: npx playwright install --with-deps chromium

@@ -1,3 +1,21 @@
+# Verified adult recognition — 2026-10-10
+
+Implemented actual YuNet/SFace/FAISS inference, live-only Stripe document/selfie verification gates, revocable database-backed sessions, dual subject/source-owner authorization, encrypted vectors/thumbnails, expiration and deletion. No production live enrollment or same-person recognition test has occurred: live credentials, a durable host and authorized adult photographs are missing.
+
+Local Python: 30 tests passed, including actual model checksum/load, real no-face Earth rejection and SFace forward-pass shape. Authorization/FAISS tests use synthetic vectors and unit-only provider records; they do not establish biometric accuracy. Existing face-localization fixtures remain detection-only and are not indexed or embedded. Adult DOB/live-selfie gates, cross-account denial, photo approval, unsafe source URLs, encrypted persistence, deletion/expiry, signed test-mode webhook rejection, CSRF/gateway checks and actual register/login/logout revocation passed. Starlette/httpx emits a deprecation warning.
+
+Frontend lint, typecheck, production build and 5 unit tests passed. Browser validation: 14 scenarios initially passed; 2 registration scenarios exposed an origin-check issue, now fixed and both passed on rerun. Two paid Lens tests were intentionally skipped. No successful recognition response is mocked in the browser. Physical-device testing and a full live provider-backed recognition journey are outstanding.
+
+Recognition cosine thresholds (0.60 for verified reference acceptance, 0.55 result threshold) are provisional, uncalibrated and not identity probabilities. Same-person cross-photo accuracy, different-person rejection, multi-face behavior on a consented collection, source-page accuracy, and held-out false-positive rates have not been measured. Do not claim perfect matches. Owner confirmation is required for source/photo correspondence.
+
+The Docker image builds and its actual non-root runtime (UID 10001) successfully loads checksum-pinned YuNet/SFace models and imports the fail-closed backend. Four additional desktop/mobile homepage and proxy-security browser checks passed after the origin fix. Production status and commit are recorded after deployment. GitHub-hosted validation remains blocked by the account billing lock.
+
+---
+
+# Historical Lens implementation and verification
+
+The following notes describe the previous image-copy search, now retained separately at `/image-search`. They are not evidence of face recognition accuracy.
+
 # Public-web image search verification
 
 The former IndexedDB collection has been removed. This version searches Google Lens through SerpApi's image upload and `exact_matches` endpoints. It does not perform face identity matching, recognition embeddings, biometric indexing, calibrated similarity scoring or same-person matching across photographs. No accuracy claim is made.

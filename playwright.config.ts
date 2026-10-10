@@ -39,9 +39,21 @@ export default defineConfig({
           reuseExistingServer: !process.env.CI,
         },
         {
+          command:
+            ".venv/bin/uvicorn tests.start_recognition:app --host 127.0.0.1 --port 8100 --no-access-log",
+          url: "http://127.0.0.1:8100/health",
+          reuseExistingServer: !process.env.CI,
+        },
+        {
           command: "npm run start",
           url: "http://127.0.0.1:3000",
-          env: { DETECTION_API_URL: "http://127.0.0.1:8000" },
+          env: {
+            DETECTION_API_URL: "http://127.0.0.1:8000",
+            RECOGNITION_API_URL: "http://127.0.0.1:8100",
+            RECOGNITION_GATEWAY_KEY:
+              "browser-test-gateway-more-than-32-characters",
+            PINFACES_PUBLIC_URL: "http://127.0.0.1:3000",
+          },
           reuseExistingServer: !process.env.CI,
         },
       ],

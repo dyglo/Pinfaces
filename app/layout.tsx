@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
-  title: "Pinfaces — Your photos. Your control.",
+  title: "Pinfaces — Recognition with verified permission.",
   description:
-    "Find copies of your photographs on the web with Google Lens. Real source links, transparent privacy, no fabricated matches.",
+    "Find your own photographs across authorized participating websites with verified adult enrollment and explicit biometric consent.",
 };
 export default function RootLayout({
   children,

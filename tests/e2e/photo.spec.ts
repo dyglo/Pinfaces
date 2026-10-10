@@ -6,7 +6,7 @@ const fixture = (name: string) =>
 test("upload preview, consent, clear session and responsive theme", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/image-search");
   await expect(
     page.getByRole("heading", { name: "Find where your photo appears." }),
   ).toBeVisible();
@@ -82,7 +82,7 @@ test("live provider returns real source pages for a public NASA Earth image", as
     "Opt-in: uses a real provider search credit",
   );
   test.setTimeout(120000);
-  await page.goto("/");
+  await page.goto("/image-search");
   await page
     .getByLabel("Upload a photograph")
     .setInputFiles(fixture("earth.jpg"));
@@ -141,7 +141,7 @@ test("live provider returns real source pages for a public NASA Earth image", as
 test("network upload failures show a connection message without fake results", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/image-search");
   await page
     .getByLabel("Upload a photograph")
     .setInputFiles(fixture("earth.jpg"));
@@ -170,7 +170,7 @@ test("search uses captured bytes without rereading the phone file", async ({
       );
     };
   });
-  await page.goto("/");
+  await page.goto("/image-search");
   await page
     .getByLabel("Upload a photograph")
     .setInputFiles(fixture("earth.jpg"));
@@ -200,7 +200,7 @@ test("unreadable native selections stop before upload and allow reselection", as
       this.dispatchEvent(new ProgressEvent("error"));
     };
   });
-  await page.goto("/");
+  await page.goto("/image-search");
   await page
     .getByLabel("Upload a photograph")
     .setInputFiles(fixture("earth.jpg"));
