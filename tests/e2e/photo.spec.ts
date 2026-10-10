@@ -87,9 +87,22 @@ test("live provider returns real source pages for a public NASA Earth image", as
     .getByLabel("Upload a photograph")
     .setInputFiles(fixture("earth.jpg"));
   await page.getByRole("checkbox").check();
+  const completed = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/search") &&
+      response.request().method() === "POST",
+    { timeout: 90000 },
+  );
   await page
     .getByRole("button", { name: "Search the web", exact: true })
     .click();
+  const searchResponse = await completed;
+  expect(searchResponse.status()).toBe(200);
+  const searchBody = await searchResponse.json();
+  expect(
+    searchBody.matches.length,
+    "Live provider returned no copies for the validation image",
+  ).toBeGreaterThan(0);
   await expect(page.locator(".result-card").first()).toBeVisible({
     timeout: 90000,
   });
