@@ -13,8 +13,13 @@ import {
 } from "lucide-react";
 import { validateFile } from "@/lib/photo";
 import type { WebMatch } from "@/lib/search";
+type SelectedPhoto = Pick<File, "name" | "size" | "type"> & {
+  bytes: ArrayBuffer;
+};
 export default function Page() {
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<SelectedPhoto | null>(null);
+  const [reading, setReading] = useState(false);
+  const selection = useRef(0);
   const [preview, setPreview] = useState("");
   const [dark, setDark] = useState(false);
   const [consent, setConsent] = useState(false);
@@ -37,27 +42,72 @@ export default function Page() {
   }, []);
   useEffect(() => {
     if (!file) return;
-    const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(
+      new Blob([file.bytes], { type: file.type }),
+    );
     const timer = setTimeout(() => setPreview(url), 0);
     return () => {
       clearTimeout(timer);
       URL.revokeObjectURL(url);
     };
   }, [file]);
-  function choose(photo?: File) {
-    if (!photo || busy) return;
+  async function choose(photo?: File) {
+    if (!photo || busy || reading) return;
+    const current = ++selection.current;
     setError("");
+    setFile(null);
+    setPreview("");
+    setMatches(null);
+    setConsent(false);
+    setReading(true);
     try {
       validateFile(photo);
-      setFile(photo);
-      setPreview("");
-      setMatches(null);
-      setConsent(false);
+      // Read while the native photo picker still grants access. The selected
+      // file reference is never retained or read again during search.
+      const unreadable =
+        "This photo could not be read from your phone. Save it to Downloads or device storage, then select that saved copy.";
+      const bytes = await new Promise<ArrayBuffer>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () =>
+          reader.result instanceof ArrayBuffer
+            ? resolve(reader.result)
+            : reject(new Error("Could not read the photo."));
+        reader.onerror = () => reject(new Error(unreadable));
+        reader.onabort = () =>
+          reject(
+            new Error("Photo selection was cancelled. Choose the image again."),
+          );
+        try {
+          reader.readAsArrayBuffer(photo);
+        } catch {
+          reject(new Error(unreadable));
+        }
+      });
+      validateFile({ size: bytes.byteLength, type: photo.type });
+      if (selection.current === current)
+        setFile({
+          name: photo.name,
+          type: photo.type,
+          size: bytes.byteLength,
+          bytes,
+        });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not read the image.");
+      if (selection.current === current)
+        setError(
+          e instanceof Error
+            ? e.message
+            : "Could not read the photo. Select a saved copy from device storage.",
+        );
+    } finally {
+      if (selection.current === current) {
+        setReading(false);
+        if (input.current) input.current.value = "";
+      }
     }
   }
   function clear() {
+    selection.current++;
+    setReading(false);
     controller.current?.abort();
     controller.current = null;
     setBusy(false);
@@ -69,7 +119,7 @@ export default function Page() {
     if (input.current) input.current.value = "";
   }
   async function search() {
-    if (!file || !consent || busy) return;
+    if (!file || !consent || busy || reading) return;
     setBusy(true);
     setError("");
     setMatches(null);
@@ -77,12 +127,9 @@ export default function Page() {
     controller.current = active;
     const timer = setTimeout(() => active.abort(), 85000);
     try {
-      // Snapshot bytes before uploading so file-backed browser uploads cannot
-      // fail when an OS/cloud photo changes while the request is in flight.
-      const bytes = await file.arrayBuffer();
       const response = await fetch("/api/search", {
         method: "POST",
-        body: bytes,
+        body: file.bytes,
         headers: { "Content-Type": file.type, "X-Search-Consent": "1" },
         signal: active.signal,
       });
@@ -185,7 +232,7 @@ export default function Page() {
               type="file"
               accept="image/jpeg,image/png,image/webp"
               aria-label="Upload a photograph"
-              onChange={(e) => choose(e.target.files?.[0])}
+              onChange={(e) => void choose(e.target.files?.[0])}
             />
             {!file ? (
               <button
@@ -199,7 +246,7 @@ export default function Page() {
                 onDrop={(e) => {
                   e.preventDefault();
                   setDragging(false);
-                  choose(e.dataTransfer.files[0]);
+                  void choose(e.dataTransfer.files[0]);
                 }}
               >
                 <span className="upload-illustration">
@@ -247,13 +294,13 @@ export default function Page() {
             <div className="action-area">
               <button
                 className="primary-button"
-                disabled={!file || !consent || busy}
+                disabled={!file || !consent || busy || reading}
                 onClick={() => void search()}
               >
-                {busy ? (
+                {busy || reading ? (
                   <>
                     <span className="spinner" />
-                    Searching the web…
+                    {reading ? "Reading photo…" : "Searching the web…"}
                   </>
                 ) : (
                   <>

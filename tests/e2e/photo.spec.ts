@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import path from "node:path";
+import { readFileSync } from "node:fs";
 const fixture = (name: string) =>
   path.join(process.cwd(), "tests/fixtures", name);
 test("upload preview, consent, clear session and responsive theme", async ({
@@ -143,4 +144,59 @@ test("network upload failures show a connection message without fake results", a
   await expect(
     page.getByRole("button", { name: "Search the web", exact: true }),
   ).toBeEnabled();
+});
+
+test("search uses captured bytes without rereading the phone file", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    File.prototype.arrayBuffer = async () => {
+      throw new DOMException(
+        "The requested file could not be read",
+        "NotReadableError",
+      );
+    };
+  });
+  await page.goto("/");
+  await page
+    .getByLabel("Upload a photograph")
+    .setInputFiles(fixture("earth.jpg"));
+  await expect(page.getByAltText("Uploaded photograph preview")).toBeVisible();
+  await page.getByRole("checkbox").check();
+  const sent = page.waitForRequest((request) =>
+    request.url().endsWith("/api/search"),
+  );
+  await page.route("**/api/search", (route) => route.abort("failed"));
+  await page
+    .getByRole("button", { name: "Search the web", exact: true })
+    .click();
+  expect((await sent).postDataBuffer()).toEqual(
+    readFileSync(fixture("earth.jpg")),
+  );
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "upload connection was interrupted",
+  );
+  await page.getByRole("button", { name: "Choose another photo" }).click();
+  await expect(page.getByAltText("Uploaded photograph preview")).toHaveCount(0);
+});
+test("unreadable native selections stop before upload and allow reselection", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    FileReader.prototype.readAsArrayBuffer = function () {
+      this.dispatchEvent(new ProgressEvent("error"));
+    };
+  });
+  await page.goto("/");
+  await page
+    .getByLabel("Upload a photograph")
+    .setInputFiles(fixture("earth.jpg"));
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Save it to Downloads",
+  );
+  await expect(
+    page.getByRole("button", { name: "Search the web", exact: true }),
+  ).toBeDisabled();
+  await expect(page.getByAltText("Uploaded photograph preview")).toHaveCount(0);
+  await expect(page.getByLabel("Upload a photograph")).toHaveValue("");
 });
