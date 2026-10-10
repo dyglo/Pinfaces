@@ -19,12 +19,33 @@ export function safeUrl(value: unknown, image = false): string | undefined {
     return;
   }
 }
+export class SearchProviderError extends Error {
+  constructor(
+    public readonly code: "quota" | "authentication" | "provider_response",
+  ) {
+    super(code);
+  }
+}
 export function parseMatches(body: unknown): WebMatch[] {
   if (!body || typeof body !== "object")
     throw new Error("Invalid search response");
   const data = body as Record<string, unknown>;
-  if (data.error) throw new Error("Provider could not complete the search");
   const metadata = data.search_metadata as Record<string, unknown> | undefined;
+  if (typeof data.error === "string") {
+    // Google's explicit no-results response is an empty search, not an outage.
+    if (
+      metadata?.status === "Success" &&
+      /^Google(?: Lens)? hasn't returned any results for this query\.?$/.test(
+        data.error,
+      )
+    )
+      return [];
+    if (/run out of searches|quota|search limit/i.test(data.error))
+      throw new SearchProviderError("quota");
+    if (/invalid api key|api key.*invalid|unauthorized/i.test(data.error))
+      throw new SearchProviderError("authentication");
+    throw new SearchProviderError("provider_response");
+  }
   if (metadata?.status !== "Success")
     throw new Error("Search did not complete");
   if (data.exact_matches === undefined) return [];

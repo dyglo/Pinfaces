@@ -77,21 +77,47 @@ export default function Page() {
     controller.current = active;
     const timer = setTimeout(() => active.abort(), 85000);
     try {
+      // Snapshot bytes before uploading so file-backed browser uploads cannot
+      // fail when an OS/cloud photo changes while the request is in flight.
+      const bytes = await file.arrayBuffer();
       const response = await fetch("/api/search", {
         method: "POST",
-        body: file,
+        body: bytes,
         headers: { "Content-Type": file.type, "X-Search-Consent": "1" },
         signal: active.signal,
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Search failed.");
+      if (!response.ok)
+        throw new Error(
+          `${data.error || "Search failed."}${data.requestId ? ` (Reference: ${data.requestId})` : ""}`,
+        );
       if (!Array.isArray(data.matches))
         throw new Error("The search response was invalid.");
       if (!active.signal.aborted) setMatches(data.matches);
     } catch (e) {
-      if (!active.signal.aborted)
-        setError(e instanceof Error ? e.message : "Search failed.");
-      else if (controller.current === active)
+      if (!active.signal.aborted) {
+        if (
+          e instanceof TypeError &&
+          /fetch|network|load failed/i.test(e.message)
+        ) {
+          let connected = false;
+          try {
+            const health = await fetch("/api/health", {
+              cache: "no-store",
+              signal: AbortSignal.timeout(5000),
+            });
+            connected = health.ok;
+          } catch {
+            /* A failed connection check needs no image or provider request. */
+          }
+          if (controller.current === active)
+            setError(
+              connected
+                ? "The image upload connection was interrupted. Please retry, or try a smaller JPEG or PNG."
+                : "Your browser cannot connect to Pinfaces. Check your connection and any VPN or browser network filters, then try again.",
+            );
+        } else setError(e instanceof Error ? e.message : "Search failed.");
+      } else if (controller.current === active)
         setError("Search was cancelled or timed out. Try again.");
     } finally {
       clearTimeout(timer);

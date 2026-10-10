@@ -21,3 +21,11 @@ All six browser scenarios passed against production, with the desktop preview ch
 Backend health at https://pinfaces-detection-next-q.vercel.app/health returned OK, `identity_matching:false`, `retains_images:false`. Web search runs in the Next.js server function and does not depend on this detector.
 
 PR: https://github.com/dyglo/Pinfaces/pull/2. GitHub Actions cannot start its validate job: “The job was not started because your account is locked due to a billing issue.” Vercel frontend/backend build checks passed. The repository owner merged PR #2 despite the blocked GitHub validation job. Merged commit: `09bba714c476ce0bac3ba3de8f14c430b33beab2`. The owner subsequently requested direct commits/pushes instead of new PRs. Verification notes, source/thumbnail assertions and CSS polish are pushed directly to main.
+
+## Reported browser failure follow-up
+
+The user reported “Failed to fetch” on pinfaces.vercel.app. A repeat real Earth-image search on the deployed site passed and returned 60 source pages. The user's browser-specific failure has not been reproduced; “Failed to fetch” means the browser did not receive an HTTP response and does not establish a provider/API-key failure.
+
+The follow-up snapshots file bytes before uploading (avoiding mutable file-backed browser uploads), checks a same-origin health endpoint after a network failure, and displays separate upload/network messages. Provider failures now log only a stage, fixed error category and random request reference; images, filenames, API keys and provider upload IDs are not logged. Quota/authentication responses have specific messages; Google's explicit successful no-results response becomes an empty state. These changes improve handling and diagnosis, not proof that the user's network issue is resolved.
+
+Local lint, typecheck, build, 5 unit tests and 6 desktop/mobile browser tests passed; paid provider tests remain opt-in. The new browser tests deliberately abort an upload to verify failure handling; they do not mock successful searches. The existing second Vercel project, pinfaces-detection, remains the independent detector; web search needs only the pinfaces project. pinfaces.vercel.app and pinfaces-next-q.vercel.app are aliases for the same frontend.

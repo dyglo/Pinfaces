@@ -59,3 +59,24 @@ describe("upload and source security", () => {
     );
   });
 });
+
+it("handles explicit no-results responses without masking outages", () => {
+  expect(
+    parseMatches({
+      search_metadata: { status: "Success" },
+      error: "Google hasn't returned any results for this query.",
+    }),
+  ).toEqual([]);
+  expect(() =>
+    parseMatches({
+      search_metadata: { status: "Error" },
+      error: "Google hasn't returned any results for this query.",
+    }),
+  ).toThrow();
+  expect(() =>
+    parseMatches({
+      search_metadata: { status: "Success" },
+      error: "Your account has run out of searches.",
+    }),
+  ).toThrow("quota");
+});

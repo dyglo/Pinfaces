@@ -123,3 +123,24 @@ test("live provider returns real source pages for a public NASA Earth image", as
   await page.getByRole("button", { name: "Clear search" }).click();
   await expect(page.locator(".result-card")).toHaveCount(0);
 });
+
+test("network upload failures show a connection message without fake results", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByLabel("Upload a photograph")
+    .setInputFiles(fixture("earth.jpg"));
+  await page.getByRole("checkbox").check();
+  await page.route("**/api/search", (route) => route.abort("failed"));
+  await page
+    .getByRole("button", { name: "Search the web", exact: true })
+    .click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "upload connection was interrupted",
+  );
+  await expect(page.locator(".result-card")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Search the web", exact: true }),
+  ).toBeEnabled();
+});

@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import { MAX_BYTES } from "@/lib/photo";
-import { parseMatches } from "@/lib/search";
+import { parseMatches, SearchProviderError } from "@/lib/search";
 export const runtime = "nodejs";
 export const maxDuration = 90;
 const headers = { "Cache-Control": "no-store" };
@@ -74,6 +74,14 @@ export async function POST(request: Request) {
       "Web search is not configured. Add SERPAPI_API_KEY to this Vercel environment and redeploy.",
       503,
     );
+  let stage = "upload";
+  const requestId = crypto.randomUUID();
+  function providerFailure(code: string, error: string, status: number) {
+    console.warn(
+      JSON.stringify({ event: "web_search_failed", requestId, stage, code }),
+    );
+    return Response.json({ error, code, requestId }, { status, headers });
+  }
   try {
     const form = new FormData();
     form.append("api_key", key);
@@ -90,7 +98,8 @@ export async function POST(request: Request) {
       redirect: "error",
     });
     if (!upload.ok)
-      return failure(
+      return providerFailure(
+        `upload_http_${upload.status}`,
         upload.status === 401
           ? "The search provider rejected the API key."
           : "The search provider could not accept the image. Check your account quota and try again.",
@@ -99,6 +108,7 @@ export async function POST(request: Request) {
     const uploaded = await upload.json();
     if (typeof uploaded.image_id !== "string")
       return failure("The provider did not accept the image.", 502);
+    stage = "search";
     const query = new URLSearchParams({
       engine: "google_lens",
       type: "exact_matches",
@@ -111,7 +121,8 @@ export async function POST(request: Request) {
       redirect: "error",
     });
     if (!response.ok)
-      return failure(
+      return providerFailure(
+        `search_http_${response.status}`,
         response.status === 429
           ? "The search quota has been reached. Try again later."
           : "The search provider could not complete the search. Check your API key and account quota.",
@@ -122,9 +133,32 @@ export async function POST(request: Request) {
       { matches, provider: "Google Lens via SerpApi", mode: "exact_matches" },
       { headers },
     );
-  } catch {
-    return failure(
-      "Web search did not complete. Please try again. No results have been fabricated.",
+  } catch (error) {
+    if (error instanceof SearchProviderError) {
+      if (error.code === "quota")
+        return providerFailure(
+          error.code,
+          "The search provider quota has been reached. Check your SerpApi account or try again after the quota resets.",
+          429,
+        );
+      if (error.code === "authentication")
+        return providerFailure(
+          error.code,
+          "The search provider rejected the API key. Check the production SerpApi configuration.",
+          503,
+        );
+      return providerFailure(
+        error.code,
+        "Google Lens could not complete this image search. Try the original image or try again later.",
+        502,
+      );
+    }
+    return providerFailure(
+      error instanceof Error &&
+        ["TimeoutError", "AbortError"].includes(error.name)
+        ? "timeout"
+        : "service_request",
+      "Web search did not complete. Please try again.",
       502,
     );
   }
