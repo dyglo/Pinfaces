@@ -36,4 +36,15 @@ No application upload/metadata logging or image writes occur in the detection se
 
 ## Production verification
 
-Local results above do not imply production deployment success. The same Playwright scenarios can run against the live URL using `BASE_URL`. Deployment state, exact merged commit and production browser results are reported in the delivery message after verification.
+Verified against **https://pinfaces-next-q.vercel.app** on 2026-10-10:
+
+- Frontend: Vercel production deployment `dpl_Eq4Cn1qVv8ygvExS7VEcGF8UJBsZ`, **READY**; deployed application commit `772c042551aad28e644830ee611ba268dc8131e3`.
+- Backend: **https://pinfaces-detection-next-q.vercel.app**, production deployment `dpl_BZiJCLePpHKWcYFz79vzMWd1Xu1g`, **READY**; `/health` returned status `ok`, no identity matching and no image retention.
+- `BASE_URL=https://pinfaces-next-q.vercel.app npm run test:e2e`: **8 passed in 23.9 seconds**. Both desktop and mobile completed the actual upload → deployed Python detection → local collection → exact-file result → source link → reload → deletion flow. No mocked inference or search responses.
+- API security checks passed on production: malformed image **400**, unsupported SVG **415**, explicit cross-site upload **403**. The backend requires the shared server credential.
+- Runtime error/fatal log queries for both projects returned no matching entries in the inspected 10-minute windows. This limited observation is not continuous monitoring.
+- Playwright external HTTP requests use the environment's inherited HTTPS proxy; no proxy is applied to local tests.
+
+GitHub **PR #1** is reviewed and **open, not merged**: https://github.com/dyglo/Pinfaces/pull/1. GitHub's `validate` job did not start and reported: **“The job was not started because your account is locked due to a billing issue.”** Both Vercel build checks passed; all checks executed locally passed. No merged commit exists. Resolve the GitHub account billing issue, rerun the quality-check workflow, and merge only after it succeeds. The deployed application is from the feature branch; it is not represented as a merged release.
+
+The connected NextQ team is currently on **Vercel Hobby**. No paid service or plan was provisioned; no R2 bucket, external database, GPU or always-on server was added. Included Hobby allowances apply; exact consumed usage/spend was not measured. Commercial operation needs a hosting plan consistent with Vercel's commercial-use terms. Application-level rate limiting is not implemented.

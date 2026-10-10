@@ -2,6 +2,10 @@
 
 A privacy-first photo tool with an original responsive Next.js interface, **real face localization** and **exact-file duplicate search** in a browser-local collection.
 
+Live app: https://pinfaces-next-q.vercel.app · Detection backend: https://pinfaces-detection-next-q.vercel.app
+
+[PR #1](https://github.com/dyglo/Pinfaces/pull/1) is reviewed but unmerged: GitHub Actions is blocked by an account billing lock. See the verification report for deployed commit and live test evidence.
+
 ## Scope
 
 This V1 does not identify people, compare identities across photographs, use face embeddings, scrape websites, or create a public face index. It only returns byte-identical files (SHA-256). Re-encoding, resizing or cropping a photograph produces a different file and will not match. No fabricated results or similarity percentages are shown.
@@ -44,7 +48,7 @@ npm run build
 npx playwright install --with-deps chromium
 npm run test:e2e
 # Reuse the same real tests against production:
-BASE_URL=https://pinfaces.vercel.app npm run test:e2e
+BASE_URL=https://pinfaces-next-q.vercel.app npm run test:e2e
 ```
 
 Playwright starts the actual Next.js production server and Python backend for local tests. No detection calls or successful search responses are mocked. See [verification report](docs/VERIFICATION.md) for measured results and limitations. The NASA/scikit-image fixture is for face localization and exact-file tests only; it is not seeded into user collections and is not a consented identity-search dataset.

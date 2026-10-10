@@ -9,6 +9,10 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: external || "http://127.0.0.1:3000",
+    proxy:
+      external && process.env.HTTPS_PROXY
+        ? { server: process.env.HTTPS_PROXY }
+        : undefined,
     trace: "off",
     screenshot: "only-on-failure",
     launchOptions: {
