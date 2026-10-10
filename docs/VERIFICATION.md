@@ -10,6 +10,8 @@ Recognition cosine thresholds (0.60 for verified reference acceptance, 0.55 resu
 
 The Docker image builds and its actual non-root runtime (UID 10001) successfully loads checksum-pinned YuNet/SFace models and imports the fail-closed backend. Four additional desktop/mobile homepage and proxy-security browser checks passed after the origin fix. Production status and commit are recorded after deployment. GitHub-hosted validation remains blocked by the account billing lock.
 
+Production frontend deployment `dpl_6HdH7vUZnXGpzru9Fq36owp4qeR1` reached READY at app commit `c5ed5d567976af2e9e175e7794a5e7c9cfb36416`, public URL https://pinfaces.vercel.app. Four desktop/mobile production browser checks passed (homepage/theme/responsiveness and proxy security). The real production health proxy returned HTTP 503 / `NOT_CONFIGURED`, accurately confirming recognition is not operational without its backend configuration. No verified adult enrollment or successful cross-photo search was claimed. Current GitHub validate check did not start: “The job was not started because your account is locked due to a billing issue.” Direct commit/push used, no new PR.
+
 ---
 
 # Historical Lens implementation and verification
